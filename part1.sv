@@ -63,13 +63,24 @@ module myExplicitFSM (
     assign win = WIN9 | WIN7 | WIN2;
 endmodule : myExplicitFSM
 
-module myFSM_test( 
-    input logic [3:0] fMove, 
-    input logic win, 
-    input logic q2,q1,q0,
-    output logic [3:0] hMove, 
-    output logic clock reset
-);
+module myFSM_test;
+    input logic [3:0] fMove;
+    input logic win;
+    input logic q2,q1,q0;
+    output logic [3:0] hMove;
+    output logic, clock, reset;
+
+    myExplicitFSM dut (
+        .fMove(fMove),
+        .win(win),
+        .q0(q0),
+        .q1(q1),
+        .q2(q2),
+        .hMove(hMove),
+        .clock(clock),
+        .reset(reset)
+    );
+
     logic START5, PLAY1, PLAY3, WIN9, WIN7, WIN2;
 
     initial begin 
