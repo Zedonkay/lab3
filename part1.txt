@@ -1,0 +1,57 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2026
+Contains Synopsys proprietary information.
+Compiler version Y-2026.03-SP1-1_Full64; Runtime version Y-2026.03-SP1-1_Full64;  Oct  7 17:02 2026
+                   0 state=xxx, fMove =  x, hMove = 15, win = x
+                   5 state=000, fMove =  5, hMove = 15, win = 0
+                  16 state=000, fMove =  5, hMove =  3, win = 0
+                  26 state=000, fMove =  5, hMove =  6, win = 0
+                  35 state=001, fMove =  1, hMove =  6, win = 0
+                  36 state=001, fMove =  1, hMove =  5, win = 0
+                  46 state=001, fMove =  1, hMove =  9, win = 0
+                  55 state=010, fMove =  3, hMove =  9, win = 0
+                  56 state=010, fMove =  3, hMove =  5, win = 0
+                  66 state=010, fMove =  3, hMove =  2, win = 0
+                  75 state=101, fMove =  7, hMove =  2, win = 1
+                  76 state=101, fMove =  7, hMove = 15, win = 1
+                  95 state=000, fMove =  5, hMove = 15, win = 0
+                  96 state=000, fMove =  5, hMove =  6, win = 0
+                 105 state=001, fMove =  1, hMove =  6, win = 0
+                 106 state=001, fMove =  1, hMove =  3, win = 0
+                 115 state=100, fMove =  9, hMove =  3, win = 1
+                 116 state=100, fMove =  9, hMove = 15, win = 1
+                 135 state=000, fMove =  5, hMove = 15, win = 0
+                 136 state=000, fMove =  5, hMove =  6, win = 0
+                 145 state=001, fMove =  1, hMove =  6, win = 0
+                 146 state=001, fMove =  1, hMove =  9, win = 0
+                 155 state=010, fMove =  3, hMove =  9, win = 0
+                 156 state=010, fMove =  3, hMove =  4, win = 0
+                 165 state=110, fMove =  2, hMove =  4, win = 1
+                 166 state=110, fMove =  2, hMove = 15, win = 1
+                 185 state=000, fMove =  5, hMove = 15, win = 0
+                 186 state=000, fMove =  5, hMove =  6, win = 0
+                 195 state=001, fMove =  1, hMove =  6, win = 0
+                 205 state=000, fMove =  5, hMove =  6, win = 0
+                 215 state=001, fMove =  1, hMove =  6, win = 0
+                 216 state=001, fMove =  1, hMove =  9, win = 0
+                 225 state=010, fMove =  3, hMove =  9, win = 0
+                 235 state=000, fMove =  5, hMove =  9, win = 0
+                 236 state=000, fMove =  5, hMove =  6, win = 0
+                 245 state=001, fMove =  1, hMove =  6, win = 0
+                 246 state=001, fMove =  1, hMove =  3, win = 0
+                 255 state=100, fMove =  9, hMove =  3, win = 1
+                 265 state=000, fMove =  5, hMove =  3, win = 0
+                 266 state=000, fMove =  5, hMove =  6, win = 0
+                 275 state=001, fMove =  1, hMove =  6, win = 0
+                 276 state=001, fMove =  1, hMove =  9, win = 0
+                 285 state=010, fMove =  3, hMove =  9, win = 0
+                 286 state=010, fMove =  3, hMove =  2, win = 0
+                 295 state=101, fMove =  7, hMove =  2, win = 1
+                 305 state=000, fMove =  5, hMove =  2, win = 0
+$finish called from file "part1.sv", line 217.
+$finish at simulation time                  306
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 306
+CPU Time:      0.090 seconds;       Data structure size:   0.0Mb
+Wed Oct  7 17:02:36 2026
