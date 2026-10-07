@@ -79,7 +79,7 @@ module myFSM_test;
         .reset(reset)
     );
 
-    logic name [2:0] = dut.currState.name;
+    logic name [2:0] = dut.currState;
     logic q0=dut.currState[0];
     logic q1=dut.currState[1];
     logic q2=dut.currState[2];
