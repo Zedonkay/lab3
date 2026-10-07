@@ -23,12 +23,11 @@ module ChipInterface
 
     HextoSevenSegment fsm_move_display (.hex(fMove), .segment(DS2_SEG));
 
-    // DS1 is unused; all active-low display signals are held blank.
+
     assign DS1_SEG = 7'b1111111;
     assign DS1_DP = 1'b1;
     assign DS1_AN = 1'b1;
 
-    // DS2 is continuously enabled and its decimal point remains blank.
     assign DS2_DP = 1'b1;
     assign DS2_AN = 1'b0;
 
