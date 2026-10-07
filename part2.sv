@@ -79,22 +79,15 @@ module myFSM_test;
         .reset(reset)
     );
 
-    logic name [2:0] = dut.currState;
+    string name= dut.currState.name;
     logic q0=dut.currState[0];
     logic q1=dut.currState[1];
     logic q2=dut.currState[2];
-    logic START5, PLAY1, PLAY3, WIN9, WIN7, WIN2;
 
     initial begin 
         clock = 0; 
         forever #5 clock = ~clock;
     end
-    assign START5 = ~q2 & ~q1 & ~q0;
-    assign PLAY1  = ~q2 & ~q1 &  q0;
-    assign PLAY3  = ~q2 &  q1 & ~q0;
-    assign WIN9   =  q2 & ~q1 & ~q0;
-    assign WIN7   =  q2 & ~q1 &  q0;
-    assign WIN2   =  q2 &  q1 & ~q0;
 
     initial begin 
         $monitor($time,, "state=%b, fMove = %d, hMove = %d, win = %b",
@@ -102,43 +95,43 @@ module myFSM_test;
         hMove = 4'hF;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset");
+        if (name != "START5") $display("Expected START5 after reset");
         reset = 1'b0;
 
         // START5 loops on an invalid move
         hMove = 4'hF;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after invalid move");
+        if (name != "START5") $display("Expected START5 after invalid move");
 
         hMove <= 4'h3;
         @(posedge clock); #1 
-        if (!START5) $display("Expected START5 after incorrect move");
+        if (name != "START5") $display("Expected START5 after incorrect move");
 
         hMove = 4'h6;
         @(posedge clock); #1;
-        if (!PLAY1) $display("Expected PLAY1 after hMove = 6");
+        if (name != "PLAY1") $display("Expected PLAY1 after hMove = 6");
 
         // PLAY1 loops on invalid moves and changes to PLAY3 on 9.
         hMove = 4'h5;
         @(posedge clock); #1;
-        if (!PLAY1) $display("Expected PLAY1 after invalid move");
+        if (name != "PLAY1") $display("Expected PLAY1 after invalid move");
 
         hMove = 4'h9;
         @(posedge clock); #1;
-        if (!PLAY3) $display("Expected PLAY3 after hMove = 9");
+        if (name != "PLAY3") $display("Expected PLAY3 after hMove = 9");
 
         // PLAY3 loops on invalid moves and can end in WIN7.
         hMove = 4'h5;
         @(posedge clock); #1;
-        if (!PLAY3) $display("Expected PLAY3 after invalid move");
+        if (name != "PLAY3") $display("Expected PLAY3 after invalid move");
 
         hMove = 4'h2;
         @(posedge clock); #1;
-        if (!WIN7 || !win) $display("Expected WIN7 after hMove = 2");
+        if (name != "WIN7" || !win) $display("Expected WIN7 after hMove = 2");
 
         hMove = 4'hF;
         @(posedge clock); #1;
-        if (!WIN7 || !win) $display("Expected WIN7 to hold");
+        if (name != "WIN7" || !win) $display("Expected WIN7 to hold");
 
         // Reset and test PLAY1 -> WIN9, then its self-loop.
         reset = 1'b1;
@@ -148,11 +141,11 @@ module myFSM_test;
         @(posedge clock); #1;
         hMove = 4'h3;
         @(posedge clock); #1;
-        if (!WIN9 || !win) $display("Expected WIN9 after hMove = 3");
+        if (name != "WIN9" || !win) $display("Expected WIN9 after hMove = 3");
 
         hMove = 4'hF;
         @(posedge clock); #1;
-        if (!WIN9 || !win) $display("Expected WIN9 to hold");
+        if (name != "WIN9" || !win) $display("Expected WIN9 to hold");
 
         // Reset and test PLAY3 -> WIN2, then its self-loop.
         reset = 1'b1;
@@ -164,16 +157,16 @@ module myFSM_test;
         @(posedge clock); #1;
         hMove = 4'h4;
         @(posedge clock); #1;
-        if (!WIN2 || !win) $display("Expected WIN2 after hMove = 4");
+        if (name != "WIN2" || !win) $display("Expected WIN2 after hMove = 4");
 
         hMove = 4'hF;
         @(posedge clock); #1;
-        if (!WIN2 || !win) $display("Expected WIN2 to hold");
+        if (name != "WIN2" || !win) $display("Expected WIN2 to hold");
 
         // Reset from WIN2.
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN2");
+        if (name != "START5") $display("Expected START5 after reset from WIN2");
         reset = 1'b0;
 
         // Reset from PLAY1.
@@ -181,7 +174,7 @@ module myFSM_test;
         @(posedge clock); #1;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from PLAY1");
+        if (name != "START5") $display("Expected START5 after reset from PLAY1");
         reset = 1'b0;
 
         // Reset from PLAY3.
@@ -191,7 +184,7 @@ module myFSM_test;
         @(posedge clock); #1;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from PLAY3");
+        if (name != "START5") $display("Expected START5 after reset from PLAY3");
         reset = 1'b0;
 
         // Reset from WIN9.
@@ -201,7 +194,7 @@ module myFSM_test;
         @(posedge clock); #1;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN9");
+        if (name != "START5") $display("Expected START5 after reset from WIN9");
         reset = 1'b0;
 
         // Reset from WIN7.
@@ -213,7 +206,7 @@ module myFSM_test;
         @(posedge clock); #1;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN7");
+        if (name != "START5") $display("Expected START5 after reset from WIN7");
         reset = 1'b0;
 
         $finish;
