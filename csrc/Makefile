@@ -19,8 +19,9 @@ PRODUCT_TIMESTAMP=product_timestamp
 # Path to runtime library
 DEPLIBS=
 VCSUCLI=-lvcsucli
+BALIBS= 
 LLVM_FLAGS=
-RUNTIME=$(LIBVCSNEW) -lnuma_stubs -lvcsnew -ldistsimclient -lsimprofile -luclinative -lmemprof_init /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/vcs_tls.o $(DEPLIBS) 
+RUNTIME=$(LIBVCSNEW) -lnuma_stubs -lvcsnew -ldistsimclient -lsimprofile -lreader_common /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libBA.a -luclinative -lmemprof_init /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/vcs_tls.o $(DEPLIBS) 
 
 VCS_SAVE_RESTORE_OBJ=/afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/vcs_save_restore_new.o
 
@@ -141,6 +142,6 @@ $(PRODUCT_TIMESTAMP) : elabMhIdDidWork_concat product_clean_order
 	@touch $(PRODUCT_TIMESTAMP)
 	@-if [ -d ./objs ]; then find ./objs -type d -empty -delete; fi
 
-$(PRODUCT) :  $(LD_VERSION_CHECK)  $(OBJS) $(DOTLIBS) $(DPI_STUB_OBJS) $(PLI_STUB_OBJS) $(CMODLIB) $(SYSC_STUB_LIB) $(DPI_ALLOW_MAIN_SO)   /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libnuma_stubs.so  /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvcsnew.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libdistsimclient.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libsimprofile.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libuclinative.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libmemprof_init.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/vcs_tls.o /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvcsucli.so  $(VCS_SAVE_RESTORE_OBJ) 
+$(PRODUCT) :  $(LD_VERSION_CHECK)  $(OBJS) $(DOTLIBS) $(DPI_STUB_OBJS) $(PLI_STUB_OBJS) $(CMODLIB) $(SYSC_STUB_LIB) $(DPI_ALLOW_MAIN_SO)   /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libnuma_stubs.so  /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvcsnew.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libdistsimclient.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libsimprofile.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libreader_common.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libBA.a /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libuclinative.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libmemprof_init.so /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/vcs_tls.o /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvcsucli.so  $(VCS_SAVE_RESTORE_OBJ) 
 	@touch $(PRODUCT)
 

@@ -1,0 +1,14 @@
+Design Module List
+
+Total Module Definition Coverage Summary
+SCORE  LINE
+ 92.62  92.62
+
+
+Total modules in report: 3
+-------------------------------------------------------------------------------
+SCORE  LINE   NAME
+ 91.47  91.47 myFSM_test
+100.00 100.00 dFlipFlop
+100.00 100.00 myExplicitFSM
+

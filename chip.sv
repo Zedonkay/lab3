@@ -19,7 +19,6 @@ module ChipInterface
 
     myExplicitFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
 
-    // For Part 2, comment out the line above and uncomment this line.
     // myAbstractFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
 
     HextoSevenSegment human_move_display (.hex(hMove), .segment(DS1_SEG));

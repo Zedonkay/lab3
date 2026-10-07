@@ -1,4 +1,4 @@
-`default_nettype none
+//`default_nettype none
 module dFlipFlop (
     output logic q,
     input logic d, clock, reset
@@ -63,158 +63,158 @@ module myExplicitFSM (
     assign win = WIN9 | WIN7 | WIN2;
 endmodule : myExplicitFSM
 
-module myFSM_test;
-    logic [3:0] fMove;
-    logic win;
-    logic q2,q1,q0;
-    logic [3:0] hMove;
-    logic clock, reset;
+//module myFSM_test;
+//    logic [3:0] fMove;
+//    logic win;
+//    logic q2,q1,q0;
+//    logic [3:0] hMove;
+//    logic clock, reset;
 
-    myExplicitFSM dut (
-        .fMove(fMove),
-        .win(win),
-        .q0(q0),
-        .q1(q1),
-        .q2(q2),
-        .hMove(hMove),
-        .clock(clock),
-        .reset(reset)
-    );
+//    myExplicitFSM dut (
+//        .fMove(fMove),
+//        .win(win),
+//        .q0(q0),
+//        .q1(q1),
+//        .q2(q2),
+//        .hMove(hMove),
+//        .clock(clock),
+//        .reset(reset)
+//    );
 
-    logic START5, PLAY1, PLAY3, WIN9, WIN7, WIN2;
+//    logic START5, PLAY1, PLAY3, WIN9, WIN7, WIN2;
 
-    initial begin 
-        clock = 0; 
-        forever #5 clock = ~clock;
-    end
-    assign START5 = ~q2 & ~q1 & ~q0;
-    assign PLAY1  = ~q2 & ~q1 &  q0;
-    assign PLAY3  = ~q2 &  q1 & ~q0;
-    assign WIN9   =  q2 & ~q1 & ~q0;
-    assign WIN7   =  q2 & ~q1 &  q0;
-    assign WIN2   =  q2 &  q1 & ~q0;
+//    initial begin 
+//        clock = 0; 
+//        forever #5 clock = ~clock;
+//    end
+//    assign START5 = ~q2 & ~q1 & ~q0;
+//    assign PLAY1  = ~q2 & ~q1 &  q0;
+//    assign PLAY3  = ~q2 &  q1 & ~q0;
+//    assign WIN9   =  q2 & ~q1 & ~q0;
+//    assign WIN7   =  q2 & ~q1 &  q0;
+//    assign WIN2   =  q2 &  q1 & ~q0;
 
-    initial begin 
-        $monitor($time,, "state=%b, fMove = %d, hMove = %d, win = %b",
-                  {q2,q1,q0}, fMove, hMove, win);
-        hMove = 4'hF;
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset");
-        reset = 1'b0;
+//    initial begin 
+//        $monitor($time,, "state=%b, fMove = %d, hMove = %d, win = %b",
+//                  {q2,q1,q0}, fMove, hMove, win);
+//        hMove = 4'hF;
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset");
+//        reset = 1'b0;
 
-        // START5 loops on an invalid move
-        hMove = 4'hF;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after invalid move");
+//        // START5 loops on an invalid move
+//        hMove = 4'hF;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after invalid move");
 
-        hMove <= 4'h3;
-        @(posedge clock); #1 
-        if (!START5) $display("Expected START5 after incorrect move");
+//        hMove <= 4'h3;
+//        @(posedge clock); #1 
+//        if (!START5) $display("Expected START5 after incorrect move");
 
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        if (!PLAY1) $display("Expected PLAY1 after hMove = 6");
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        if (!PLAY1) $display("Expected PLAY1 after hMove = 6");
 
-        // PLAY1 loops on invalid moves and changes to PLAY3 on 9.
-        hMove = 4'h5;
-        @(posedge clock); #1;
-        if (!PLAY1) $display("Expected PLAY1 after invalid move");
+//        // PLAY1 loops on invalid moves and changes to PLAY3 on 9.
+//        hMove = 4'h5;
+//        @(posedge clock); #1;
+//        if (!PLAY1) $display("Expected PLAY1 after invalid move");
 
-        hMove = 4'h9;
-        @(posedge clock); #1;
-        if (!PLAY3) $display("Expected PLAY3 after hMove = 9");
+//        hMove = 4'h9;
+//        @(posedge clock); #1;
+//        if (!PLAY3) $display("Expected PLAY3 after hMove = 9");
 
-        // PLAY3 loops on invalid moves and can end in WIN7.
-        hMove = 4'h5;
-        @(posedge clock); #1;
-        if (!PLAY3) $display("Expected PLAY3 after invalid move");
+//        // PLAY3 loops on invalid moves and can end in WIN7.
+//        hMove = 4'h5;
+//        @(posedge clock); #1;
+//        if (!PLAY3) $display("Expected PLAY3 after invalid move");
 
-        hMove = 4'h2;
-        @(posedge clock); #1;
-        if (!WIN7 || !win) $display("Expected WIN7 after hMove = 2");
+//        hMove = 4'h2;
+//        @(posedge clock); #1;
+//        if (!WIN7 || !win) $display("Expected WIN7 after hMove = 2");
 
-        hMove = 4'hF;
-        @(posedge clock); #1;
-        if (!WIN7 || !win) $display("Expected WIN7 to hold");
+//        hMove = 4'hF;
+//        @(posedge clock); #1;
+//        if (!WIN7 || !win) $display("Expected WIN7 to hold");
 
-        // Reset and test PLAY1 -> WIN9, then its self-loop.
-        reset = 1'b1;
-        @(posedge clock); #1;
-        reset = 1'b0;
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        hMove = 4'h3;
-        @(posedge clock); #1;
-        if (!WIN9 || !win) $display("Expected WIN9 after hMove = 3");
+//        // Reset and test PLAY1 -> WIN9, then its self-loop.
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        reset = 1'b0;
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        hMove = 4'h3;
+//        @(posedge clock); #1;
+//        if (!WIN9 || !win) $display("Expected WIN9 after hMove = 3");
 
-        hMove = 4'hF;
-        @(posedge clock); #1;
-        if (!WIN9 || !win) $display("Expected WIN9 to hold");
+//        hMove = 4'hF;
+//        @(posedge clock); #1;
+//        if (!WIN9 || !win) $display("Expected WIN9 to hold");
 
-        // Reset and test PLAY3 -> WIN2, then its self-loop.
-        reset = 1'b1;
-        @(posedge clock); #1;
-        reset = 1'b0;
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        hMove = 4'h9;
-        @(posedge clock); #1;
-        hMove = 4'h4;
-        @(posedge clock); #1;
-        if (!WIN2 || !win) $display("Expected WIN2 after hMove = 4");
+//        // Reset and test PLAY3 -> WIN2, then its self-loop.
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        reset = 1'b0;
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        hMove = 4'h9;
+//        @(posedge clock); #1;
+//        hMove = 4'h4;
+//        @(posedge clock); #1;
+//        if (!WIN2 || !win) $display("Expected WIN2 after hMove = 4");
 
-        hMove = 4'hF;
-        @(posedge clock); #1;
-        if (!WIN2 || !win) $display("Expected WIN2 to hold");
+//        hMove = 4'hF;
+//        @(posedge clock); #1;
+//        if (!WIN2 || !win) $display("Expected WIN2 to hold");
 
-        // Reset from WIN2.
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN2");
-        reset = 1'b0;
+//        // Reset from WIN2.
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset from WIN2");
+//        reset = 1'b0;
 
-        // Reset from PLAY1.
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from PLAY1");
-        reset = 1'b0;
+//        // Reset from PLAY1.
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset from PLAY1");
+//        reset = 1'b0;
 
-        // Reset from PLAY3.
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        hMove = 4'h9;
-        @(posedge clock); #1;
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from PLAY3");
-        reset = 1'b0;
+//        // Reset from PLAY3.
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        hMove = 4'h9;
+//        @(posedge clock); #1;
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset from PLAY3");
+//        reset = 1'b0;
 
-        // Reset from WIN9.
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        hMove = 4'h3;
-        @(posedge clock); #1;
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN9");
-        reset = 1'b0;
+//        // Reset from WIN9.
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        hMove = 4'h3;
+//        @(posedge clock); #1;
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset from WIN9");
+//        reset = 1'b0;
 
-        // Reset from WIN7.
-        hMove = 4'h6;
-        @(posedge clock); #1;
-        hMove = 4'h9;
-        @(posedge clock); #1;
-        hMove = 4'h2;
-        @(posedge clock); #1;
-        reset = 1'b1;
-        @(posedge clock); #1;
-        if (!START5) $display("Expected START5 after reset from WIN7");
-        reset = 1'b0;
+//        // Reset from WIN7.
+//        hMove = 4'h6;
+//        @(posedge clock); #1;
+//        hMove = 4'h9;
+//        @(posedge clock); #1;
+//        hMove = 4'h2;
+//        @(posedge clock); #1;
+//        reset = 1'b1;
+//        @(posedge clock); #1;
+//        if (!START5) $display("Expected START5 after reset from WIN7");
+//        reset = 1'b0;
 
-        $finish;
-    end
-endmodule : myFSM_test
+//        $finish;
+//    end
+//endmodule : myFSM_test
         

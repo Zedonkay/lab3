@@ -1,0 +1,529 @@
+===============================================================================
+Module : myFSM_test
+===============================================================================
+SCORE  LINE   
+ 91.47  91.47 
+
+Source File(s) : 
+
+/afs/andrew.cmu.edu/usr16/ishikhar/Documents/lab3/part1.sv
+
+Module self-instances :
+
+SCORE  LINE   NAME       
+ 91.47  91.47 myFSM_test 
+
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Module : myFSM_test
+
+             Line No.   Total   Covered  Percent
+TOTAL                      211      193    91.47
+INITIAL            87        4        4   100.00
+CONT_ASSIGN        90        1        1   100.00
+CONT_ASSIGN        91        1        1   100.00
+CONT_ASSIGN        92        1        1   100.00
+CONT_ASSIGN        93        1        1   100.00
+CONT_ASSIGN        94        1        1   100.00
+CONT_ASSIGN        95        1        1   100.00
+INITIAL            98      201      183    91.04
+
+86                          initial begin 
+87         1/1                  clock = 0; 
+88         3/3                  forever #5 clock = ~clock;
+89                          end
+90         1/1              assign START5 = ~q2 & ~q1 & ~q0;
+91         1/1              assign PLAY1  = ~q2 & ~q1 &  q0;
+92         1/1              assign PLAY3  = ~q2 &  q1 & ~q0;
+93         1/1              assign WIN9   =  q2 & ~q1 & ~q0;
+94         1/1              assign WIN7   =  q2 & ~q1 &  q0;
+95         1/1              assign WIN2   =  q2 &  q1 & ~q0;
+96                      
+97                          initial begin 
+98         1/1                  $monitor($time,, "state=%b, fMove = %d, hMove = %d, win = %b",
+99                                        {q2,q1,q0}, fMove, hMove, win);
+100        1/1                  hMove = 4'hF;
+101        1/1                  reset = 1'b1;
+102        4/4                  @(posedge clock); #1;
+103        1/2     ==>          if (!START5) $display("Expected START5 after reset");
+                        MISSING_ELSE
+104        1/1                  reset = 1'b0;
+105                     
+106                             // START5 loops on an invalid move
+107        1/1                  hMove = 4'hF;
+108        4/4                  @(posedge clock); #1;
+109        1/2     ==>          if (!START5) $display("Expected START5 after invalid move");
+                        MISSING_ELSE
+110                     
+111        1/1                  hMove <= 4'h3;
+112        3/3                  @(posedge clock); #1 
+113        1/2     ==>          if (!START5) $display("Expected START5 after incorrect move");
+                        MISSING_ELSE
+114                     
+115        1/1                  hMove = 4'h6;
+116        4/4                  @(posedge clock); #1;
+117        1/2     ==>          if (!PLAY1) $display("Expected PLAY1 after hMove = 6");
+                        MISSING_ELSE
+118                     
+119                             // PLAY1 loops on invalid moves and changes to PLAY3 on 9.
+120        1/1                  hMove = 4'h5;
+121        4/4                  @(posedge clock); #1;
+122        1/2     ==>          if (!PLAY1) $display("Expected PLAY1 after invalid move");
+                        MISSING_ELSE
+123                     
+124        1/1                  hMove = 4'h9;
+125        4/4                  @(posedge clock); #1;
+126        1/2     ==>          if (!PLAY3) $display("Expected PLAY3 after hMove = 9");
+                        MISSING_ELSE
+127                     
+128                             // PLAY3 loops on invalid moves and can end in WIN7.
+129        1/1                  hMove = 4'h5;
+130        4/4                  @(posedge clock); #1;
+131        1/2     ==>          if (!PLAY3) $display("Expected PLAY3 after invalid move");
+                        MISSING_ELSE
+132                     
+133        1/1                  hMove = 4'h2;
+134        4/4                  @(posedge clock); #1;
+135        1/2     ==>          if (!WIN7 || !win) $display("Expected WIN7 after hMove = 2");
+                        MISSING_ELSE
+136                     
+137        1/1                  hMove = 4'hF;
+138        4/4                  @(posedge clock); #1;
+139        1/2     ==>          if (!WIN7 || !win) $display("Expected WIN7 to hold");
+                        MISSING_ELSE
+140                     
+141                             // Reset and test PLAY1 -> WIN9, then its self-loop.
+142        1/1                  reset = 1'b1;
+143        4/4                  @(posedge clock); #1;
+144        1/1                  reset = 1'b0;
+145        1/1                  hMove = 4'h6;
+146        4/4                  @(posedge clock); #1;
+147        1/1                  hMove = 4'h3;
+148        4/4                  @(posedge clock); #1;
+149        1/2     ==>          if (!WIN9 || !win) $display("Expected WIN9 after hMove = 3");
+                        MISSING_ELSE
+150                     
+151        1/1                  hMove = 4'hF;
+152        4/4                  @(posedge clock); #1;
+153        1/2     ==>          if (!WIN9 || !win) $display("Expected WIN9 to hold");
+                        MISSING_ELSE
+154                     
+155                             // Reset and test PLAY3 -> WIN2, then its self-loop.
+156        1/1                  reset = 1'b1;
+157        4/4                  @(posedge clock); #1;
+158        1/1                  reset = 1'b0;
+159        1/1                  hMove = 4'h6;
+160        4/4                  @(posedge clock); #1;
+161        1/1                  hMove = 4'h9;
+162        4/4                  @(posedge clock); #1;
+163        1/1                  hMove = 4'h4;
+164        4/4                  @(posedge clock); #1;
+165        1/2     ==>          if (!WIN2 || !win) $display("Expected WIN2 after hMove = 4");
+                        MISSING_ELSE
+166                     
+167        1/1                  hMove = 4'hF;
+168        4/4                  @(posedge clock); #1;
+169        1/2     ==>          if (!WIN2 || !win) $display("Expected WIN2 to hold");
+                        MISSING_ELSE
+170                     
+171                             // Reset from WIN2.
+172        1/1                  reset = 1'b1;
+173        4/4                  @(posedge clock); #1;
+174        1/2     ==>          if (!START5) $display("Expected START5 after reset from WIN2");
+                        MISSING_ELSE
+175        1/1                  reset = 1'b0;
+176                     
+177                             // Reset from PLAY1.
+178        1/1                  hMove = 4'h6;
+179        4/4                  @(posedge clock); #1;
+180        1/1                  reset = 1'b1;
+181        4/4                  @(posedge clock); #1;
+182        1/2     ==>          if (!START5) $display("Expected START5 after reset from PLAY1");
+                        MISSING_ELSE
+183        1/1                  reset = 1'b0;
+184                     
+185                             // Reset from PLAY3.
+186        1/1                  hMove = 4'h6;
+187        4/4                  @(posedge clock); #1;
+188        1/1                  hMove = 4'h9;
+189        4/4                  @(posedge clock); #1;
+190        1/1                  reset = 1'b1;
+191        4/4                  @(posedge clock); #1;
+192        1/2     ==>          if (!START5) $display("Expected START5 after reset from PLAY3");
+                        MISSING_ELSE
+193        1/1                  reset = 1'b0;
+194                     
+195                             // Reset from WIN9.
+196        1/1                  hMove = 4'h6;
+197        4/4                  @(posedge clock); #1;
+198        1/1                  hMove = 4'h3;
+199        4/4                  @(posedge clock); #1;
+200        1/1                  reset = 1'b1;
+201        4/4                  @(posedge clock); #1;
+202        1/2     ==>          if (!START5) $display("Expected START5 after reset from WIN9");
+                        MISSING_ELSE
+203        1/1                  reset = 1'b0;
+204                     
+205                             // Reset from WIN7.
+206        1/1                  hMove = 4'h6;
+207        4/4                  @(posedge clock); #1;
+208        1/1                  hMove = 4'h9;
+209        4/4                  @(posedge clock); #1;
+210        1/1                  hMove = 4'h2;
+211        4/4                  @(posedge clock); #1;
+212        1/1                  reset = 1'b1;
+213        4/4                  @(posedge clock); #1;
+214        1/2     ==>          if (!START5) $display("Expected START5 after reset from WIN7");
+                        MISSING_ELSE
+215        1/1                  reset = 1'b0;
+216                     
+217        1/1                  $finish;
+
+-------------------------------------------------------------------------------
+===============================================================================
+Module Instance : myFSM_test
+===============================================================================
+
+Instance :
+
+SCORE  LINE   
+ 91.47  91.47 
+
+
+Instance's subtree :
+
+SCORE  LINE   
+ 92.80  92.80 
+
+
+Module : 
+
+SCORE  LINE   NAME       
+ 91.47  91.47 myFSM_test 
+
+
+Parent : 
+
+none
+----------------
+
+
+Subtrees :
+
+SCORE  LINE   NAME 
+100.00 100.00 dut  
+
+
+
+-------------------------------------------------------------------------------
+Since this is the module's only instance, the coverage report is the same as for the module.
+===============================================================================
+Module : dFlipFlop
+===============================================================================
+SCORE  LINE   
+100.00 100.00 
+
+Source File(s) : 
+
+/afs/andrew.cmu.edu/usr16/ishikhar/Documents/lab3/part1.sv
+
+Module self-instances :
+
+SCORE  LINE   NAME               
+100.00 100.00 myFSM_test.dut.ff0 
+100.00 100.00 myFSM_test.dut.ff1 
+100.00 100.00 myFSM_test.dut.ff2 
+
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Module : dFlipFlop
+
+             Line No.   Total   Covered  Percent
+TOTAL                        3        3   100.00
+ALWAYS              7        3        3   100.00
+
+6                           always_ff @(posedge clock)
+7          1/1                  if (reset)
+8          1/1                      q <= 1'b0;
+9                               else
+10         1/1                      q <= d;
+
+-------------------------------------------------------------------------------
+===============================================================================
+Module Instance : myFSM_test.dut.ff0
+===============================================================================
+
+Instance :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Instance's subtree :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Module : 
+
+SCORE  LINE   NAME      
+100.00 100.00 dFlipFlop 
+
+
+Parent : 
+
+SCORE  LINE   NAME 
+100.00 100.00 dut  
+
+
+Subtrees :
+
+
+no children
+----------------
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Instance : myFSM_test.dut.ff0
+
+             Line No.   Total   Covered  Percent
+TOTAL                        3        3   100.00
+ALWAYS              7        3        3   100.00
+
+6                           always_ff @(posedge clock)
+7          1/1                  if (reset)
+8          1/1                      q <= 1'b0;
+9                               else
+10         1/1                      q <= d;
+
+-------------------------------------------------------------------------------
+===============================================================================
+Module Instance : myFSM_test.dut.ff1
+===============================================================================
+
+Instance :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Instance's subtree :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Module : 
+
+SCORE  LINE   NAME      
+100.00 100.00 dFlipFlop 
+
+
+Parent : 
+
+SCORE  LINE   NAME 
+100.00 100.00 dut  
+
+
+Subtrees :
+
+
+no children
+----------------
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Instance : myFSM_test.dut.ff1
+
+             Line No.   Total   Covered  Percent
+TOTAL                        3        3   100.00
+ALWAYS              7        3        3   100.00
+
+6                           always_ff @(posedge clock)
+7          1/1                  if (reset)
+8          1/1                      q <= 1'b0;
+9                               else
+10         1/1                      q <= d;
+
+-------------------------------------------------------------------------------
+===============================================================================
+Module Instance : myFSM_test.dut.ff2
+===============================================================================
+
+Instance :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Instance's subtree :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Module : 
+
+SCORE  LINE   NAME      
+100.00 100.00 dFlipFlop 
+
+
+Parent : 
+
+SCORE  LINE   NAME 
+100.00 100.00 dut  
+
+
+Subtrees :
+
+
+no children
+----------------
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Instance : myFSM_test.dut.ff2
+
+             Line No.   Total   Covered  Percent
+TOTAL                        3        3   100.00
+ALWAYS              7        3        3   100.00
+
+6                           always_ff @(posedge clock)
+7          1/1                  if (reset)
+8          1/1                      q <= 1'b0;
+9                               else
+10         1/1                      q <= d;
+
+===============================================================================
+Module : myExplicitFSM
+===============================================================================
+SCORE  LINE   
+100.00 100.00 
+
+Source File(s) : 
+
+/afs/andrew.cmu.edu/usr16/ishikhar/Documents/lab3/part1.sv
+
+Module self-instances :
+
+SCORE  LINE   NAME           
+100.00 100.00 myFSM_test.dut 
+
+
+
+-------------------------------------------------------------------------------
+Line Coverage for Module : myExplicitFSM
+
+             Line No.   Total   Covered  Percent
+TOTAL                       30       30   100.00
+CONT_ASSIGN        29        1        1   100.00
+CONT_ASSIGN        30        1        1   100.00
+CONT_ASSIGN        31        1        1   100.00
+CONT_ASSIGN        32        1        1   100.00
+CONT_ASSIGN        33        1        1   100.00
+CONT_ASSIGN        34        1        1   100.00
+CONT_ASSIGN        36        1        1   100.00
+CONT_ASSIGN        37        1        1   100.00
+CONT_ASSIGN        38        1        1   100.00
+CONT_ASSIGN        39        1        1   100.00
+CONT_ASSIGN        40        1        1   100.00
+CONT_ASSIGN        41        1        1   100.00
+CONT_ASSIGN        42        1        1   100.00
+CONT_ASSIGN        44        1        1   100.00
+CONT_ASSIGN        45        1        1   100.00
+CONT_ASSIGN        46        1        1   100.00
+CONT_ASSIGN        47        1        1   100.00
+CONT_ASSIGN        49        1        1   100.00
+CONT_ASSIGN        50        1        1   100.00
+CONT_ASSIGN        51        1        1   100.00
+CONT_ASSIGN        52        1        1   100.00
+CONT_ASSIGN        53        1        1   100.00
+CONT_ASSIGN        55        1        1   100.00
+CONT_ASSIGN        56        1        1   100.00
+CONT_ASSIGN        57        1        1   100.00
+CONT_ASSIGN        59        1        1   100.00
+CONT_ASSIGN        60        1        1   100.00
+CONT_ASSIGN        61        1        1   100.00
+CONT_ASSIGN        62        1        1   100.00
+CONT_ASSIGN        63        1        1   100.00
+
+28                      
+29         1/1              assign START5 = ~q2 & ~q1 & ~q0;
+30         1/1              assign PLAY1  = ~q2 & ~q1 &  q0;
+31         1/1              assign PLAY3  = ~q2 &  q1 & ~q0;
+32         1/1              assign WIN9   =  q2 & ~q1 & ~q0;
+33         1/1              assign WIN7   =  q2 & ~q1 &  q0;
+34         1/1              assign WIN2   =  q2 &  q1 & ~q0;
+35                      
+36         1/1              assign h2 = (hMove == 4'h2);
+37         1/1              assign h3 = (hMove == 4'h3);
+38         1/1              assign h4 = (hMove == 4'h4);
+39         1/1              assign h6 = (hMove == 4'h6);
+40         1/1              assign h7 = (hMove == 4'h7);
+41         1/1              assign h8 = (hMove == 4'h8);
+42         1/1              assign h9 = (hMove == 4'h9);
+43                      
+44         1/1              assign p1Win9 = h2 | h3 | h4 | h7 | h8;
+45         1/1              assign p1Invalid = ~(p1Win9 | h9);
+46         1/1              assign p3Win2 = h4 | h7 | h8;
+47         1/1              assign p3Invalid = ~(p3Win2 | h2);
+48                      
+49         1/1              assign nextPLAY1 = (START5 & h6) | (PLAY1 & p1Invalid);
+50         1/1              assign nextPLAY3 = (PLAY1 & h9) | (PLAY3 & p3Invalid);
+51         1/1              assign nextWIN9 = (PLAY1 & p1Win9) | WIN9;
+52         1/1              assign nextWIN7 = (PLAY3 & h2) | WIN7;
+53         1/1              assign nextWIN2 = (PLAY3 & p3Win2) | WIN2;
+54                      
+55         1/1              assign d0 = nextPLAY1 | nextWIN7;
+56         1/1              assign d1 = nextPLAY3 | nextWIN2;
+57         1/1              assign d2 = nextWIN9 | nextWIN7 | nextWIN2;
+58                      
+59         1/1              assign fMove[3] = WIN9;
+60         1/1              assign fMove[2] = START5 | WIN7;
+61         1/1              assign fMove[1] = PLAY3 | WIN7 | WIN2;
+62         1/1              assign fMove[0] = START5 | PLAY1 | PLAY3 | WIN9 | WIN7;
+63         1/1              assign win = WIN9 | WIN7 | WIN2;
+
+-------------------------------------------------------------------------------
+===============================================================================
+Module Instance : myFSM_test.dut
+===============================================================================
+
+Instance :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Instance's subtree :
+
+SCORE  LINE   
+100.00 100.00 
+
+
+Module : 
+
+SCORE  LINE   NAME          
+100.00 100.00 myExplicitFSM 
+
+
+Parent : 
+
+SCORE  LINE   NAME       
+ 91.47  91.47 myFSM_test 
+
+
+Subtrees :
+
+SCORE  LINE   NAME 
+100.00 100.00 ff0  
+100.00 100.00 ff1  
+100.00 100.00 ff2  
+
+
+
+-------------------------------------------------------------------------------
+Since this is the module's only instance, the coverage report is the same as for the module.

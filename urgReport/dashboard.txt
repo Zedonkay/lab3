@@ -1,0 +1,28 @@
+Dashboard
+
+Date: Wed Oct  7 17:20:34 2026
+
+User: ishikhar
+
+Version: Y-2026.03-SP1-1
+Command line: urg -dir simv.vdb -format text
+
+Number of tests: 1
+
+-------------------------------------------------------------------------------
+Total Coverage Summary
+SCORE  LINE
+ 92.80  92.80
+
+
+-------------------------------------------------------------------------------
+Hierarchical coverage data for top-level instances
+SCORE  LINE   NAME
+ 92.80  92.80 myFSM_test
+
+
+-------------------------------------------------------------------------------
+Total Module Definition Coverage Summary
+SCORE  LINE
+ 92.62  92.62
+

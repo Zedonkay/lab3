@@ -1,5 +1,5 @@
 0
-24
+27
 -Mamsrun=
 -Masflags=
 -Mcc=gcc
@@ -18,11 +18,14 @@
 -Mxcflags= -pipe -fPIC -I/afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/include
 -Mxllcflags=
 -Xhdlxmropt
+-cm
+-cm_line
 -gen_obj
--nc
 -picarchive
 -sverilog
 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/bin/vcs1fe
+line
+contassign
 part1.sv
 72
 which_declare=declare -f
@@ -87,7 +90,7 @@ LC_ALL=C
 KRB5CCNAME=KEYRING:persistent:2703112
 HISTCONTROL=ignoredups
 GNOME_TERMINAL_SERVICE=:1.85
-GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/2f3ef0d5_e696_4180_89d2_71b4ca697dc3
+GNOME_TERMINAL_SCREEN=/org/gnome/Terminal/screen/abfd72ba_3f65_458e_8036_a234063d9050
 GNOME_SETUP_DISPLAY=:1
 GDM_LANG=en_US.UTF-8
 GDMSESSION=gnome
@@ -99,13 +102,14 @@ DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/2703112/bus
 COLORTERM=truecolor
 0
 0
-2
+3
 1784276826 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/packages/snps_msv_nettype_pkg/AN.DB
 1791406634 part1.sv
+1784257696 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/include/cm_vcsd.tab
 4
 1784262180 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvirsim.so
 1784258707 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/liberrorinf.so
 1784258702 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libsnpsmalloc.so
 1784258692 /afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/lib/libvfs.so
-1791406948 simv.daidir
+1791407974 simv.daidir
 -1 partitionlib
