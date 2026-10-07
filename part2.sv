@@ -95,7 +95,7 @@ module myFSM_test;
         hMove = 4'hF;
         reset = 1'b1;
         @(posedge clock); #1;
-        if (name != "START5") $display("Expected START5 after reset");
+        if (name != "START5") $display("Expected START5 after reset", name);
         reset = 1'b0;
 
         // START5 loops on an invalid move
