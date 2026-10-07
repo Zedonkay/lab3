@@ -66,10 +66,10 @@ module myAbstractFSM (
 endmodule : myAbstractFSM
 
 module myFSM_test;
-    input logic [3:0] fMove;
-    input logic win;
-    output logic [3:0] hMove; 
-    output logic, clock, reset;
+    logic [3:0] fMove;
+    logic win;
+    logic [3:0] hMove; 
+    logic, clock, reset;
 
     myAbstractFSM dut (
         .fMove(fMove),

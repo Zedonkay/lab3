@@ -64,11 +64,11 @@ module myExplicitFSM (
 endmodule : myExplicitFSM
 
 module myFSM_test;
-    input logic [3:0] fMove;
-    input logic win;
-    input logic q2,q1,q0;
-    output logic [3:0] hMove;
-    output logic, clock, reset;
+    logic [3:0] fMove;
+    logic win;
+    logic q2,q1,q0;
+    logic [3:0] hMove;
+    logic, clock, reset;
 
     myExplicitFSM dut (
         .fMove(fMove),
