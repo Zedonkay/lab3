@@ -91,7 +91,7 @@ module myFSM_test;
 
     initial begin 
         $monitor($time,, "state=%s, fMove = %d, hMove = %d, win = %b",
-                  name, fMove, hMove, win);
+                  dut.currState.name, fMove, hMove, win);
         hMove = 4'hF;
         reset = 1'b1;
         @(posedge clock); #1;
