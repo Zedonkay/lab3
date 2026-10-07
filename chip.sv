@@ -1,7 +1,7 @@
 
 module ChipInterface
-    (output logic [ 6:0] DS1_SEG , DS2_SEG,
-     output logic DS1_DP , DS1_AN , DS2_DP , DS2_AN ,
+    (output logic [ 3:0] D2_AN , D1_AN,
+     output logic [ 7:0] D2_SEG, D1_SEG,
      output logic [17:0] LD ,
      output logic [ 2:0] RGB0 , RGB1 ,
      input logic [17:0] SW ,
@@ -21,12 +21,17 @@ module ChipInterface
 
     // myAbstractFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
 
-    HextoSevenSegment human_move_display (.hex(hMove), .segment(DS1_SEG));
-    HextoSevenSegment fsm_move_display   (.hex(fMove), .segment(DS2_SEG));
-
-    assign DS1_AN = 1'b0;
-    assign DS2_AN = 1'b0;
-    assign DS1_DP = 1'b1;
-    assign DS2_DP = 1'b1;
+    EightSevenSegmentDisplays displays (
+        .HEX7(4'h0), .HEX6(4'h0), .HEX5(4'h0), .HEX4(4'h0),
+        .HEX3(4'h0), .HEX2(4'h0), .HEX1(fMove), .HEX0(hMove),
+        .CLOCK_100(clock),
+        .reset(reset_N),
+        .dec_points(8'b0),
+        .blank(8'b1111_1100),
+        .D2_AN,
+        .D1_AN,
+        .D2_SEG,
+        .D1_SEG
+    );
 
 endmodule : ChipInterface
