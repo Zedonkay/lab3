@@ -1,0 +1,15 @@
+rmapats_mop.o: rmapats.m
+	@/afs/ece.cmu.edu/support/synopsys/synopsys.release/Foundation-Y/vcs/Y-2026.03-SP1-1/linux64/bin/cgmop1  -tls_initexe  -pic -gen_obj rmapats.m rmapats_mop.o; rm -f rmapats.m; touch rmapats.m; touch rmapats_mop.o
+
+RMAPATS_CFLAGS_CG = -Wno-int-conversion -Wno-implicit-function-declaration -Wno-incompatible-pointer-types
+
+rmapats.o: rmapats.c
+	@ $(CC_CG) $(CFLAGS_CG) $(RMAPATS_CFLAGS_CG) -c -fPIC -x c -o rmapats.o rmapats.c  
+rmapats%.o: rmapats%.c
+	@ $(CC_CG) $(CFLAGS_CG) $(RMAPATS_CFLAGS_CG) -c -fPIC -x c -o $@ $<  
+rmar.o: rmar.c
+	@ $(CC_CG) $(CFLAGS_RMAR) $(RMAPATS_CFLAGS_CG) -c -fPIC -x c -o rmar.o rmar.c  
+rmar%.o: rmar%.c
+	@ $(CC_CG) $(CFLAGS_RMAR) $(RMAPATS_CFLAGS_CG) -c -fPIC -x c -o $@ $<  
+
+include filelist.hsopt.objs

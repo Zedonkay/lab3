@@ -1,0 +1,81 @@
+Info: [VCS_SAVE_RESTORE_INFO] ASLR (Address Space Layout Randomization) is detected on the machine. To enable $save functionality, ASLR will be switched off and simv re-executed.
+Please use '-no_save' simv switch to avoid re-execution or '-suppress=ASLR_DETECTED_INFO' to suppress this message.
+Chronologic VCS simulator copyright 1991-2026
+Contains Synopsys proprietary information.
+Compiler version Y-2026.03-SP1-1_Full64; Runtime version Y-2026.03-SP1-1_Full64;  Oct  7 17:02 2026
+
+Warning-[RT-NCMUCS] No condition matches in statement
+part2.sv, 42
+  No condition matches in 'unique case' statement. 'default' specification is 
+  missing, inside myFSM_test.dut, at time 0s.
+
+                   0 state=, fMove =  0, hMove = 15, win = 0
+                   5 state=START5, fMove =  5, hMove = 15, win = 0
+Expected START5 after reset
+Expected START5 after invalid move
+                  16 state=START5, fMove =  5, hMove =  3, win = 0
+Expected START5 after incorrect move
+                  26 state=START5, fMove =  5, hMove =  6, win = 0
+                  35 state=PLAY1, fMove =  1, hMove =  6, win = 0
+Expected PLAY1 after hMove = 6
+                  36 state=PLAY1, fMove =  1, hMove =  5, win = 0
+Expected PLAY1 after invalid move
+                  46 state=PLAY1, fMove =  1, hMove =  9, win = 0
+                  55 state=PLAY3, fMove =  3, hMove =  9, win = 0
+Expected PLAY3 after hMove = 9
+                  56 state=PLAY3, fMove =  3, hMove =  5, win = 0
+Expected PLAY3 after invalid move
+                  66 state=PLAY3, fMove =  3, hMove =  2, win = 0
+                  75 state=WIN7, fMove =  7, hMove =  2, win = 1
+Expected WIN7 after hMove = 2
+                  76 state=WIN7, fMove =  7, hMove = 15, win = 1
+Expected WIN7 to hold
+                  95 state=START5, fMove =  5, hMove = 15, win = 0
+                  96 state=START5, fMove =  5, hMove =  6, win = 0
+                 105 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 106 state=PLAY1, fMove =  1, hMove =  3, win = 0
+                 115 state=WIN9, fMove =  9, hMove =  3, win = 1
+Expected WIN9 after hMove = 3
+                 116 state=WIN9, fMove =  9, hMove = 15, win = 1
+Expected WIN9 to hold
+                 135 state=START5, fMove =  5, hMove = 15, win = 0
+                 136 state=START5, fMove =  5, hMove =  6, win = 0
+                 145 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 146 state=PLAY1, fMove =  1, hMove =  9, win = 0
+                 155 state=PLAY3, fMove =  3, hMove =  9, win = 0
+                 156 state=PLAY3, fMove =  3, hMove =  4, win = 0
+                 165 state=WIN2, fMove =  2, hMove =  4, win = 1
+Expected WIN2 after hMove = 4
+                 166 state=WIN2, fMove =  2, hMove = 15, win = 1
+Expected WIN2 to hold
+                 185 state=START5, fMove =  5, hMove = 15, win = 0
+Expected START5 after reset from WIN2
+                 186 state=START5, fMove =  5, hMove =  6, win = 0
+                 195 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 205 state=START5, fMove =  5, hMove =  6, win = 0
+Expected START5 after reset from PLAY1
+                 215 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 216 state=PLAY1, fMove =  1, hMove =  9, win = 0
+                 225 state=PLAY3, fMove =  3, hMove =  9, win = 0
+                 235 state=START5, fMove =  5, hMove =  9, win = 0
+Expected START5 after reset from PLAY3
+                 236 state=START5, fMove =  5, hMove =  6, win = 0
+                 245 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 246 state=PLAY1, fMove =  1, hMove =  3, win = 0
+                 255 state=WIN9, fMove =  9, hMove =  3, win = 1
+                 265 state=START5, fMove =  5, hMove =  3, win = 0
+Expected START5 after reset from WIN9
+                 266 state=START5, fMove =  5, hMove =  6, win = 0
+                 275 state=PLAY1, fMove =  1, hMove =  6, win = 0
+                 276 state=PLAY1, fMove =  1, hMove =  9, win = 0
+                 285 state=PLAY3, fMove =  3, hMove =  9, win = 0
+                 286 state=PLAY3, fMove =  3, hMove =  2, win = 0
+                 295 state=WIN7, fMove =  7, hMove =  2, win = 1
+                 305 state=START5, fMove =  5, hMove =  2, win = 0
+Expected START5 after reset from WIN7
+$finish called from file "part2.sv", line 212.
+$finish at simulation time                  306
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 306
+CPU Time:      0.090 seconds;       Data structure size:   0.0Mb
+Wed Oct  7 17:02:22 2026
