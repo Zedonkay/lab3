@@ -68,7 +68,7 @@ module myFSM_test;
     logic win;
     logic q2,q1,q0;
     logic [3:0] hMove;
-    logic, clock, reset;
+    logic clock, reset;
 
     myExplicitFSM dut (
         .fMove(fMove),
