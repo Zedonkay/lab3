@@ -55,6 +55,7 @@ module myAbstractFSM (
                 fMove = 4'b0010;
                 win = 1'b1;
             end
+            default: $display("fuck");
         endcase
     end
 
