@@ -1,215 +1,201 @@
-//`default_nettype none
+`default_nettype none
+
 module myAbstractFSM (
     output logic [3:0] fMove,
     output logic win,
+    output logic [3:0] HEX7, HEX6, HEX5, HEX4,
+    output logic [3:0] HEX3, HEX2, HEX1, HEX0,
+    output logic [7:0] blank,
     input logic [3:0] hMove,
+    input logic enter, new_game,
     input logic clock, reset
 );
-    enum logic [2:0] {START5, PLAY1, PLAY3, WIN9, WIN7, WIN2} currState, nextState;
+    // The state records the move history. No move registers or sorter are used.
+    // HOLD states remember a submitted move until enter is released.
+    typedef enum logic [4:0] {
+        START5, HOLD6, PLAY1, HOLD9, PLAY3,
+        HOLD_H2_WIN9, HOLD_H3_WIN9, HOLD_H4_WIN9,
+        HOLD_H7_WIN9, HOLD_H8_WIN9,
+        HOLD_H2_WIN7, HOLD_H4_WIN2, HOLD_H7_WIN2, HOLD_H8_WIN2,
+        INVALID5, INVALID1, INVALID3,
+        WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8,
+        WIN7_H2, WIN2_H4, WIN2_H7, WIN2_H8
+    } state_t;
+    state_t currState, nextState;
+
+    // A small second FSM handles restarting while the game FSM keeps its
+    // winning state and display. A press begun before win cannot restart.
+    typedef enum logic [1:0] {WAIT_NEW_RELEASE, READY_NEW, WAIT_BOTH_RELEASE}
+        restart_state_t;
+    restart_state_t restartState, nextRestartState;
+    logic restart_game;
 
     always_comb begin
+        nextRestartState = restartState;
+        restart_game = 1'b0;
+        if (!win)
+            nextRestartState = WAIT_NEW_RELEASE;
+        else begin
+            case (restartState)
+                WAIT_NEW_RELEASE:
+                    if (!new_game) nextRestartState = READY_NEW;
+                READY_NEW:
+                    if (new_game) nextRestartState = WAIT_BOTH_RELEASE;
+                WAIT_BOTH_RELEASE:
+                    if (!new_game && !enter) begin
+                        restart_game = 1'b1;
+                        nextRestartState = WAIT_NEW_RELEASE;
+                    end
+                default: nextRestartState = WAIT_NEW_RELEASE;
+            endcase
+        end
+    end
+
+    always_comb begin
+        nextState = currState;
         case (currState)
             START5:
-                if (hMove == 4'h6)
-                    nextState = PLAY1;
-                else
-                    nextState = START5;
+                if (enter) begin
+                    if (hMove == 4'd6) nextState = HOLD6;
+                    else nextState = INVALID5;
+                end
+            HOLD6: if (!enter) nextState = PLAY1;
             PLAY1:
-                if (hMove == 4'h9)
-                    nextState = PLAY3;
-                else if (hMove == 4'h2 || hMove == 4'h3 || hMove == 4'h4 ||
-                         hMove == 4'h7 || hMove == 4'h8)
-                    nextState = WIN9;
-                else
-                    nextState = PLAY1;
+                if (enter) begin
+                    case (hMove)
+                        4'd2: nextState = HOLD_H2_WIN9;
+                        4'd3: nextState = HOLD_H3_WIN9;
+                        4'd4: nextState = HOLD_H4_WIN9;
+                        4'd7: nextState = HOLD_H7_WIN9;
+                        4'd8: nextState = HOLD_H8_WIN9;
+                        4'd9: nextState = HOLD9;
+                        default: nextState = INVALID1;
+                    endcase
+                end
+            HOLD9: if (!enter) nextState = PLAY3;
             PLAY3:
-                if (hMove == 4'h2)
-                    nextState = WIN7;
-                else if (hMove == 4'h4 || hMove == 4'h7 || hMove == 4'h8)
-                    nextState = WIN2;
-                else
-                    nextState = PLAY3;
-            WIN9: nextState = WIN9;
-            WIN7: nextState = WIN7;
-            WIN2: nextState = WIN2;
+                if (enter) begin
+                    case (hMove)
+                        4'd2: nextState = HOLD_H2_WIN7;
+                        4'd4: nextState = HOLD_H4_WIN2;
+                        4'd7: nextState = HOLD_H7_WIN2;
+                        4'd8: nextState = HOLD_H8_WIN2;
+                        default: nextState = INVALID3;
+                    endcase
+                end
+            HOLD_H2_WIN9: if (!enter) nextState = WIN9_H2;
+            HOLD_H3_WIN9: if (!enter) nextState = WIN9_H3;
+            HOLD_H4_WIN9: if (!enter) nextState = WIN9_H4;
+            HOLD_H7_WIN9: if (!enter) nextState = WIN9_H7;
+            HOLD_H8_WIN9: if (!enter) nextState = WIN9_H8;
+            HOLD_H2_WIN7: if (!enter) nextState = WIN7_H2;
+            HOLD_H4_WIN2: if (!enter) nextState = WIN2_H4;
+            HOLD_H7_WIN2: if (!enter) nextState = WIN2_H7;
+            HOLD_H8_WIN2: if (!enter) nextState = WIN2_H8;
+            INVALID5: if (!enter) nextState = START5;
+            INVALID1: if (!enter) nextState = PLAY1;
+            INVALID3: if (!enter) nextState = PLAY3;
+            WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8,
+            WIN7_H2, WIN2_H4, WIN2_H7, WIN2_H8:
+                if (restart_game) nextState = START5;
             default: nextState = START5;
         endcase
     end
 
+    // Moore outputs: every digit, blank bit, move and win depends only on
+    // currState. Human digits update on press; FPGA digits update on release.
+    // Within each packed group, the leftmost digit is the smallest move.
     always_comb begin
-        fMove = 4'b0000;
+        fMove = 4'd5;
         win = 1'b0;
-        unique case (currState)
-            START5: fMove = 4'b0101;
-            PLAY1: fMove = 4'b0001;
-            PLAY3: fMove = 4'b0011;
-            WIN9: begin
-                fMove = 4'b1001;
-                win = 1'b1;
+        {HEX7, HEX6, HEX5, HEX4} = 16'h0000;
+        {HEX3, HEX2, HEX1, HEX0} = 16'h5000;
+        blank = 8'b1111_0111;
+        case (currState)
+            START5, INVALID5: begin end
+            HOLD6: begin
+                {HEX7, HEX6, HEX5, HEX4} = 16'h6000;
+                blank = 8'b0111_0111;
             end
-            WIN7: begin
-                fMove = 4'b0111;
-                win = 1'b1;
+            PLAY1, INVALID1: begin
+                fMove = 4'd1;
+                {HEX7, HEX6, HEX5, HEX4} = 16'h6000;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1500;
+                blank = 8'b0111_0011;
             end
-            WIN2: begin
-                fMove = 4'b0010;
-                win = 1'b1;
+            HOLD9, HOLD_H2_WIN9, HOLD_H3_WIN9, HOLD_H4_WIN9,
+            HOLD_H7_WIN9, HOLD_H8_WIN9: begin
+                fMove = 4'd1;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1500;
+                blank = 8'b0011_0011;
+                case (currState)
+                    HOLD_H2_WIN9: {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
+                    HOLD_H3_WIN9: {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
+                    HOLD_H4_WIN9: {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
+                    HOLD_H7_WIN9: {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
+                    HOLD_H8_WIN9: {HEX7, HEX6, HEX5, HEX4} = 16'h6800;
+                    default:     {HEX7, HEX6, HEX5, HEX4} = 16'h6900;
+                endcase
             end
-            default: $display("fuck");
+            PLAY3, INVALID3: begin
+                fMove = 4'd3;
+                {HEX7, HEX6, HEX5, HEX4} = 16'h6900;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1350;
+                blank = 8'b0011_0001;
+            end
+            HOLD_H2_WIN7, HOLD_H4_WIN2, HOLD_H7_WIN2, HOLD_H8_WIN2: begin
+                fMove = 4'd3;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1350;
+                blank = 8'b0001_0001;
+                case (currState)
+                    HOLD_H2_WIN7: {HEX7, HEX6, HEX5, HEX4} = 16'h2690;
+                    HOLD_H4_WIN2: {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
+                    HOLD_H7_WIN2: {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
+                    default:     {HEX7, HEX6, HEX5, HEX4} = 16'h6890;
+                endcase
+            end
+            WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8: begin
+                fMove = 4'd9;
+                win = 1'b1;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1590;
+                blank = 8'b0011_0001;
+                case (currState)
+                    WIN9_H2: {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
+                    WIN9_H3: {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
+                    WIN9_H4: {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
+                    WIN9_H7: {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
+                    default: {HEX7, HEX6, HEX5, HEX4} = 16'h6800;
+                endcase
+            end
+            WIN7_H2: begin
+                fMove = 4'd7;
+                win = 1'b1;
+                {HEX7, HEX6, HEX5, HEX4} = 16'h2690;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1357;
+                blank = 8'b0001_0000;
+            end
+            WIN2_H4, WIN2_H7, WIN2_H8: begin
+                fMove = 4'd2;
+                win = 1'b1;
+                {HEX3, HEX2, HEX1, HEX0} = 16'h1235;
+                blank = 8'b0001_0000;
+                case (currState)
+                    WIN2_H4: {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
+                    WIN2_H7: {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
+                    default: {HEX7, HEX6, HEX5, HEX4} = 16'h6890;
+                endcase
+            end
+            default: begin end
         endcase
     end
 
     always_ff @(posedge clock)
-        if (reset)
+        if (reset) begin
             currState <= START5;
-        else
+            restartState <= WAIT_NEW_RELEASE;
+        end
+        else begin
             currState <= nextState;
+            restartState <= nextRestartState;
+        end
 endmodule : myAbstractFSM
-
-//module myFSM_test;
-//    logic [3:0] fMove;
-//    logic win;
-//    logic [3:0] hMove; 
-//    logic clock, reset;
-
-//    myAbstractFSM dut (
-//        .fMove(fMove),
-//        .win(win),
-//        .hMove(hMove),
-//        .clock(clock),
-//        .reset(reset)
-//    );
-
-//    logic q0=dut.currState[0];
-//    logic q1=dut.currState[1];
-//    logic q2=dut.currState[2];
-
-//    initial begin 
-//        clock = 0; 
-//        forever #5 clock = ~clock;
-//    end
-
-//    initial begin 
-//        $monitor($time,, "state=%s, fMove = %d, hMove = %d, win = %b",
-//                  dut.currState.name, fMove, hMove, win);
-//        hMove = 4'hF;
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset");
-//        reset = 1'b0;
-
-//        // START5 loops on an invalid move
-//        hMove = 4'hF;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after invalid move");
-
-//        hMove <= 4'h3;
-//        @(posedge clock); #1 
-//        if (dut.currState.name != "START5") $display("Expected START5 after incorrect move");
-
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "PLAY1") $display("Expected PLAY1 after hMove = 6");
-
-//        // PLAY1 loops on invalid moves and changes to PLAY3 on 9.
-//        hMove = 4'h5;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "PLAY1") $display("Expected PLAY1 after invalid move");
-
-//        hMove = 4'h9;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "PLAY3") $display("Expected PLAY3 after hMove = 9");
-
-//        // PLAY3 loops on invalid moves and can end in WIN7.
-//        hMove = 4'h5;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "PLAY3") $display("Expected PLAY3 after invalid move");
-
-//        hMove = 4'h2;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN7" || !win) $display("Expected WIN7 after hMove = 2");
-
-//        hMove = 4'hF;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN7" || !win) $display("Expected WIN7 to hold");
-
-//        // Reset and test PLAY1 -> WIN9, then its self-loop.
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        reset = 1'b0;
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        hMove = 4'h3;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN9" || !win) $display("Expected WIN9 after hMove = 3");
-
-//        hMove = 4'hF;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN9" || !win) $display("Expected WIN9 to hold");
-
-//        // Reset and test PLAY3 -> WIN2, then its self-loop.
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        reset = 1'b0;
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        hMove = 4'h9;
-//        @(posedge clock); #1;
-//        hMove = 4'h4;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN2" || !win) $display("Expected WIN2 after hMove = 4");
-
-//        hMove = 4'hF;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "WIN2" || !win) $display("Expected WIN2 to hold");
-
-//        // Reset from WIN2.
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset from WIN2");
-//        reset = 1'b0;
-
-//        // Reset from PLAY1.
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset from PLAY1");
-//        reset = 1'b0;
-
-//        // Reset from PLAY3.
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        hMove = 4'h9;
-//        @(posedge clock); #1;
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset from PLAY3");
-//        reset = 1'b0;
-
-//        // Reset from WIN9.
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        hMove = 4'h3;
-//        @(posedge clock); #1;
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset from WIN9");
-//        reset = 1'b0;
-
-//        // Reset from WIN7.
-//        hMove = 4'h6;
-//        @(posedge clock); #1;
-//        hMove = 4'h9;
-//        @(posedge clock); #1;
-//        hMove = 4'h2;
-//        @(posedge clock); #1;
-//        reset = 1'b1;
-//        @(posedge clock); #1;
-//        if (dut.currState.name != "START5") $display("Expected START5 after reset from WIN7");
-//        reset = 1'b0;
-
-//        $finish;
-//    end
-//endmodule : myFSM_test
-        
