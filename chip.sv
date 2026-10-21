@@ -17,9 +17,9 @@ module ChipInterface
     assign reset_N = SW[17];
     assign hMove = SW[15:12];
 
-    myExplicitFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
+    //myExplicitFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
 
-    // myAbstractFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
+    myAbstractFSM fsm (.fMove, .win, .hMove, .clock, .reset(reset_N));
 
     HextoSevenSegment fsm_move_display (.hex(fMove), .segment(DS2_SEG));
 
