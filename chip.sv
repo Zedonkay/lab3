@@ -14,9 +14,6 @@ module ChipInterface (
     logic [3:0] HEX7, HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0;
     logic [7:0] blank;
 
-    // Synchronize the asynchronous board inputs before using them in the FSM.
-    // Set the move switches before pressing enter. These are synchronizers,
-    // not mechanical-button debouncers.
     (* ASYNC_REG = "TRUE" *) logic [6:0] inputs_meta, inputs_sync;
     always_ff @(posedge CLOCK_100) begin
         inputs_meta <= {SW[15], BTN[0], BTN[3], SW[3:0]};
@@ -38,6 +35,6 @@ module ChipInterface (
 
     assign LD = {14'b0, fMove};
     assign RGB0 = 3'b000;
-    // Both red and blue are on for purple (active-high RGB channels).
+
     assign RGB1 = win ? 3'b101 : 3'b000;
 endmodule : ChipInterface

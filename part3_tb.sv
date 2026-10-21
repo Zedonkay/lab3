@@ -1,12 +1,9 @@
 `timescale 1ns/1ps
 `default_nettype none
 
-// Run with:
-// iverilog -g2012 -s part3_tb -o /tmp/lab3-test.vvp *.sv
-// vvp /tmp/lab3-test.vvp
 module part3_tb;
     logic clock = 0;
-    always #5 clock = ~clock; // 100 MHz
+    always #5 clock = ~clock;
     logic reset, enter, new_game;
     logic [3:0] hMove, fMove;
     logic win;
@@ -58,8 +55,6 @@ module part3_tb;
         tick(); check_start();
     endtask
 
-    // Deliberately change all switch values while held. None may change
-    // the accepted human move or submit the following move.
     task automatic submit(
         input logic [3:0] move_value, old_fpga_move, next_fpga_move,
         input logic next_win,
@@ -85,10 +80,26 @@ module part3_tb;
         submit(9, 1, 3, 0, 16'h6900, 16'h1500, 16'h1350, 8'h33, 8'h31);
     endtask
 
+    task automatic restart_terminal(
+        input logic [3:0] expected_move,
+        input logic [15:0] human_digits, fpga_digits,
+        input logic [7:0] expected_blank
+    );
+        tick();
+        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        enter = 1; tick();
+        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        new_game = 1; tick();
+        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        new_game = 0; tick();
+        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        enter = 0; tick(); check_start();
+    endtask
+
     task automatic reach_win;
         reset_game(); first_move();
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
-        tick(); check_win9(); // observe new_game low in the win state
+        tick(); check_win9();
     endtask
 
     initial begin
@@ -96,8 +107,6 @@ module part3_tb;
         SW = 0; SW[15] = 1; BTN = 0;
         reset_game();
 
-        // Every switch combination at every turn, including invalid presses
-        // changed to a valid switch value without releasing enter.
         for (int v = 0; v < 16; v++) begin
             if (v != 6) begin
                 reset_game(); hMove = v; enter = 1; tick(); check_start();
@@ -118,7 +127,7 @@ module part3_tb;
                 submit(v, 1, 9, 1, human_digits, 16'h1500, 16'h1590, 8'h33, 8'h31);
                 repeat (3) tick();
                 check_outputs(9, 1, human_digits, 16'h1590, 8'h31);
-                // Reset must work in every terminal state.
+                restart_terminal(9, human_digits, 16'h1590, 8'h31);
                 reset_game();
             end
             else if (v == 9) second_nine();
@@ -142,6 +151,8 @@ module part3_tb;
                 endcase
                 submit(v, 3, (v == 2 ? 7 : 2), 1, human_digits,
                     16'h1350, (v == 2 ? 16'h1357 : 16'h1235), 8'h11, 8'h10);
+                restart_terminal((v == 2 ? 7 : 2), human_digits,
+                    (v == 2 ? 16'h1357 : 16'h1235), 8'h10);
                 reset_game();
             end
             else begin
@@ -154,51 +165,41 @@ module part3_tb;
             end
         end
 
-        // Nothing and enter alone have no effect in win.
         reach_win(); repeat (5) tick(); check_win9();
         enter = 1; repeat (5) tick(); check_win9();
         enter = 0; tick(); check_win9();
 
-        // New game alone: only restart on release.
         new_game = 1; repeat (5) tick(); check_win9();
         new_game = 0; tick(); check_start();
 
-        // Enter pressed and released entirely within a new-game press.
         reach_win(); new_game = 1; tick();
         enter = 1; tick(); check_win9();
         enter = 0; tick(); check_win9();
         new_game = 0; tick(); check_start();
 
-        // Enter begins first and is released before new_game.
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         enter = 0; tick(); check_win9();
         new_game = 0; tick(); check_start();
 
-        // Enter buffers new_game, including a second enter press.
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         new_game = 0; repeat (4) tick(); check_win9();
         new_game = 1; tick(); new_game = 0; tick(); check_win9();
         enter = 0; tick(); check_start();
 
-        // Enter starts during new_game and extends past its release.
         reach_win(); new_game = 1; tick(); enter = 1; tick();
         new_game = 0; repeat (4) tick(); check_win9();
         enter = 0; tick(); check_start();
 
-        // Releasing enter briefly while new_game is held cannot restart.
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         enter = 0; tick(); check_win9();
         enter = 1; tick(); new_game = 0; tick(); check_win9();
         enter = 0; tick(); check_start();
 
-        // A press wholly outside win has no effect.
         reset_game(); new_game = 1; tick(); new_game = 0; tick();
         check_start(); first_move();
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
         repeat (4) tick(); check_win9();
 
-        // New_game held across entry into win must be released and pressed
-        // again. Releasing that earlier press alone does not restart.
         reset_game(); first_move(); new_game = 1;
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
         repeat (4) tick(); check_win9();
@@ -206,7 +207,6 @@ module part3_tb;
         new_game = 1; tick(); check_win9();
         new_game = 0; tick(); check_start();
 
-        // Reset overrides accepted, held and invalid submissions.
         reset_game(); hMove = 6; enter = 1; tick();
         reset = 1; tick(); check_start();
         reset_game(); first_move(); hMove = 2; enter = 1; tick();
@@ -216,7 +216,6 @@ module part3_tb;
         reset_game(); hMove = 0; enter = 1; tick();
         reset = 1; tick(); check_start();
 
-        // Board-level smoke test through actual two-stage synchronizers.
         repeat (5) tick();
         if (LD !== 18'd5 || RGB1 !== 0 || RGB0 !== 0)
             $fatal(1, "Board reset outputs incorrect");
@@ -238,7 +237,7 @@ module part3_tb;
         BTN[0] = 0; repeat (5) tick();
         if (LD !== 18'd5 || RGB1 !== 0 || board.blank !== 8'hf7)
             $fatal(1, "Board restart incorrect");
-        // Exercise all four multiplexed anodes, including blank digits.
+
         SW[15] = 1; repeat (5) tick();
         SW[15] = 0; repeat (5) tick();
         if (D1_AN !== 4'b1110 || D2_AN !== 4'b1110 ||

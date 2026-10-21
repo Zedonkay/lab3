@@ -10,46 +10,26 @@ module myAbstractFSM (
     input logic enter, new_game,
     input logic clock, reset
 );
-    // The state records the move history. No move registers or sorter are used.
-    // HOLD states remember a submitted move until enter is released.
-    typedef enum logic [4:0] {
+
+    typedef enum logic [5:0] {
         START5, HOLD6, PLAY1, HOLD9, PLAY3,
         HOLD_H2_WIN9, HOLD_H3_WIN9, HOLD_H4_WIN9,
         HOLD_H7_WIN9, HOLD_H8_WIN9,
         HOLD_H2_WIN7, HOLD_H4_WIN2, HOLD_H7_WIN2, HOLD_H8_WIN2,
         INVALID5, INVALID1, INVALID3,
         WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8,
-        WIN7_H2, WIN2_H4, WIN2_H7, WIN2_H8
+        WIN7_H2, WIN2_H4, WIN2_H7, WIN2_H8,
+        WIN9_H2_READY_NEW, WIN9_H2_WAIT_BOTH_RELEASE,
+        WIN9_H3_READY_NEW, WIN9_H3_WAIT_BOTH_RELEASE,
+        WIN9_H4_READY_NEW, WIN9_H4_WAIT_BOTH_RELEASE,
+        WIN9_H7_READY_NEW, WIN9_H7_WAIT_BOTH_RELEASE,
+        WIN9_H8_READY_NEW, WIN9_H8_WAIT_BOTH_RELEASE,
+        WIN7_H2_READY_NEW, WIN7_H2_WAIT_BOTH_RELEASE,
+        WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE,
+        WIN2_H7_READY_NEW, WIN2_H7_WAIT_BOTH_RELEASE,
+        WIN2_H8_READY_NEW, WIN2_H8_WAIT_BOTH_RELEASE
     } state_t;
     state_t currState, nextState;
-
-    // A small second FSM handles restarting while the game FSM keeps its
-    // winning state and display. A press begun before win cannot restart.
-    typedef enum logic [1:0] {WAIT_NEW_RELEASE, READY_NEW, WAIT_BOTH_RELEASE}
-        restart_state_t;
-    restart_state_t restartState, nextRestartState;
-    logic restart_game;
-
-    always_comb begin
-        nextRestartState = restartState;
-        restart_game = 1'b0;
-        if (!win)
-            nextRestartState = WAIT_NEW_RELEASE;
-        else begin
-            case (restartState)
-                WAIT_NEW_RELEASE:
-                    if (!new_game) nextRestartState = READY_NEW;
-                READY_NEW:
-                    if (new_game) nextRestartState = WAIT_BOTH_RELEASE;
-                WAIT_BOTH_RELEASE:
-                    if (!new_game && !enter) begin
-                        restart_game = 1'b1;
-                        nextRestartState = WAIT_NEW_RELEASE;
-                    end
-                default: nextRestartState = WAIT_NEW_RELEASE;
-            endcase
-        end
-    end
 
     always_comb begin
         nextState = currState;
@@ -95,16 +75,64 @@ module myAbstractFSM (
             INVALID5: if (!enter) nextState = START5;
             INVALID1: if (!enter) nextState = PLAY1;
             INVALID3: if (!enter) nextState = PLAY3;
-            WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8,
-            WIN7_H2, WIN2_H4, WIN2_H7, WIN2_H8:
-                if (restart_game) nextState = START5;
+            WIN9_H2:
+                if (!new_game) nextState = WIN9_H2_READY_NEW;
+            WIN9_H2_READY_NEW:
+                if (new_game) nextState = WIN9_H2_WAIT_BOTH_RELEASE;
+            WIN9_H2_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN9_H3:
+                if (!new_game) nextState = WIN9_H3_READY_NEW;
+            WIN9_H3_READY_NEW:
+                if (new_game) nextState = WIN9_H3_WAIT_BOTH_RELEASE;
+            WIN9_H3_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN9_H4:
+                if (!new_game) nextState = WIN9_H4_READY_NEW;
+            WIN9_H4_READY_NEW:
+                if (new_game) nextState = WIN9_H4_WAIT_BOTH_RELEASE;
+            WIN9_H4_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN9_H7:
+                if (!new_game) nextState = WIN9_H7_READY_NEW;
+            WIN9_H7_READY_NEW:
+                if (new_game) nextState = WIN9_H7_WAIT_BOTH_RELEASE;
+            WIN9_H7_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN9_H8:
+                if (!new_game) nextState = WIN9_H8_READY_NEW;
+            WIN9_H8_READY_NEW:
+                if (new_game) nextState = WIN9_H8_WAIT_BOTH_RELEASE;
+            WIN9_H8_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN7_H2:
+                if (!new_game) nextState = WIN7_H2_READY_NEW;
+            WIN7_H2_READY_NEW:
+                if (new_game) nextState = WIN7_H2_WAIT_BOTH_RELEASE;
+            WIN7_H2_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN2_H4:
+                if (!new_game) nextState = WIN2_H4_READY_NEW;
+            WIN2_H4_READY_NEW:
+                if (new_game) nextState = WIN2_H4_WAIT_BOTH_RELEASE;
+            WIN2_H4_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN2_H7:
+                if (!new_game) nextState = WIN2_H7_READY_NEW;
+            WIN2_H7_READY_NEW:
+                if (new_game) nextState = WIN2_H7_WAIT_BOTH_RELEASE;
+            WIN2_H7_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
+            WIN2_H8:
+                if (!new_game) nextState = WIN2_H8_READY_NEW;
+            WIN2_H8_READY_NEW:
+                if (new_game) nextState = WIN2_H8_WAIT_BOTH_RELEASE;
+            WIN2_H8_WAIT_BOTH_RELEASE:
+                if (!new_game && !enter) nextState = START5;
             default: nextState = START5;
         endcase
     end
 
-    // Moore outputs: every digit, blank bit, move and win depends only on
-    // currState. Human digits update on press; FPGA digits update on release.
-    // Within each packed group, the leftmost digit is the smallest move.
     always_comb begin
         fMove = 4'd5;
         win = 1'b0;
@@ -154,34 +182,38 @@ module myAbstractFSM (
                     default:     {HEX7, HEX6, HEX5, HEX4} = 16'h6890;
                 endcase
             end
-            WIN9_H2, WIN9_H3, WIN9_H4, WIN9_H7, WIN9_H8: begin
+            WIN9_H2, WIN9_H2_READY_NEW, WIN9_H2_WAIT_BOTH_RELEASE, WIN9_H3, WIN9_H3_READY_NEW,
+            WIN9_H3_WAIT_BOTH_RELEASE, WIN9_H4, WIN9_H4_READY_NEW, WIN9_H4_WAIT_BOTH_RELEASE, WIN9_H7,
+            WIN9_H7_READY_NEW, WIN9_H7_WAIT_BOTH_RELEASE, WIN9_H8, WIN9_H8_READY_NEW, WIN9_H8_WAIT_BOTH_RELEASE:
+            begin
                 fMove = 4'd9;
                 win = 1'b1;
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1590;
                 blank = 8'b0011_0001;
                 case (currState)
-                    WIN9_H2: {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
-                    WIN9_H3: {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
-                    WIN9_H4: {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
-                    WIN9_H7: {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
+                    WIN9_H2, WIN9_H2_READY_NEW, WIN9_H2_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
+                    WIN9_H3, WIN9_H3_READY_NEW, WIN9_H3_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
+                    WIN9_H4, WIN9_H4_READY_NEW, WIN9_H4_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
+                    WIN9_H7, WIN9_H7_READY_NEW, WIN9_H7_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
                     default: {HEX7, HEX6, HEX5, HEX4} = 16'h6800;
                 endcase
             end
-            WIN7_H2: begin
+            WIN7_H2, WIN7_H2_READY_NEW, WIN7_H2_WAIT_BOTH_RELEASE: begin
                 fMove = 4'd7;
                 win = 1'b1;
                 {HEX7, HEX6, HEX5, HEX4} = 16'h2690;
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1357;
                 blank = 8'b0001_0000;
             end
-            WIN2_H4, WIN2_H7, WIN2_H8: begin
+            WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE, WIN2_H7, WIN2_H7_READY_NEW,
+            WIN2_H7_WAIT_BOTH_RELEASE, WIN2_H8, WIN2_H8_READY_NEW, WIN2_H8_WAIT_BOTH_RELEASE: begin
                 fMove = 4'd2;
                 win = 1'b1;
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1235;
                 blank = 8'b0001_0000;
                 case (currState)
-                    WIN2_H4: {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
-                    WIN2_H7: {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
+                    WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
+                    WIN2_H7, WIN2_H7_READY_NEW, WIN2_H7_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
                     default: {HEX7, HEX6, HEX5, HEX4} = 16'h6890;
                 endcase
             end
@@ -190,12 +222,8 @@ module myAbstractFSM (
     end
 
     always_ff @(posedge clock)
-        if (reset) begin
+        if (reset)
             currState <= START5;
-            restartState <= WAIT_NEW_RELEASE;
-        end
-        else begin
+        else
             currState <= nextState;
-            restartState <= nextRestartState;
-        end
 endmodule : myAbstractFSM
