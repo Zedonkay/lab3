@@ -9,7 +9,7 @@ module part3_tb;
     logic win;
     logic [3:0] HEX7, HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0;
     logic [7:0] blank;
-    myAbstractFSM dut (.*);
+    myExpandedFSM dut (.*);
 
     logic [17:0] SW;
     logic [3:0] BTN;

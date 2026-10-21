@@ -10,7 +10,7 @@ module ChipInterface (
     input logic CLOCK_100
 );
     logic [3:0] hMove, fMove;
-    logic enter, new_game, reset, win;
+    logic clock, enter, new_game, reset, win;
     logic [3:0] HEX7, HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0;
     logic [7:0] blank;
 
@@ -19,12 +19,41 @@ module ChipInterface (
         inputs_meta <= {SW[15], BTN[0], BTN[3], SW[3:0]};
         inputs_sync <= inputs_meta;
     end
-    assign {reset, new_game, enter, hMove} = inputs_sync;
 
-    myAbstractFSM fsm (
+    // Uncomment exactly one complete Part block. Part 3 is selected below.
+
+    // Part 1: BTN[3] clocks; SW[17] resets; SW[15:12] selects hMove.
+    // assign clock = BTN[3];
+    // assign reset = SW[17];
+    // assign hMove = SW[15:12];
+    // assign enter = 1'b0;
+    // assign new_game = 1'b0;
+    // myExplicitFSM fsm (
+    //     .fMove, .win, .q0(), .q1(), .q2(), .hMove, .clock, .reset
+    // );
+    // assign {HEX7, HEX6, HEX5, HEX4} = {hMove, 12'b0};
+    // assign {HEX3, HEX2, HEX1, HEX0} = {fMove, 12'b0};
+    // assign blank = 8'b0111_0111;
+
+    // Part 2: BTN[3] clocks; SW[17] resets; SW[15:12] selects hMove.
+    // assign clock = BTN[3];
+    // assign reset = SW[17];
+    // assign hMove = SW[15:12];
+    // assign enter = 1'b0;
+    // assign new_game = 1'b0;
+    // myAbstractFSM fsm (.fMove, .win, .hMove, .clock, .reset);
+    // assign {HEX7, HEX6, HEX5, HEX4} = {hMove, 12'b0};
+    // assign {HEX3, HEX2, HEX1, HEX0} = {fMove, 12'b0};
+    // assign blank = 8'b0111_0111;
+
+    // Part 3: 100 MHz clock; SW[15] resets; SW[3:0] selects hMove.
+    // BTN[3] enters a move; BTN[0] requests a new game.
+    assign clock = CLOCK_100;
+    assign {reset, new_game, enter, hMove} = inputs_sync;
+    myExpandedFSM fsm (
         .fMove, .win, .HEX7, .HEX6, .HEX5, .HEX4,
         .HEX3, .HEX2, .HEX1, .HEX0, .blank,
-        .hMove, .enter, .new_game, .clock(CLOCK_100), .reset
+        .hMove, .enter, .new_game, .clock, .reset
     );
 
     EightSevenSegmentDisplays displays (
@@ -35,6 +64,5 @@ module ChipInterface (
 
     assign LD = {14'b0, fMove};
     assign RGB0 = 3'b000;
-
     assign RGB1 = win ? 3'b101 : 3'b000;
 endmodule : ChipInterface
