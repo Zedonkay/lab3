@@ -1,0 +1,6 @@
+# Keep SystemVerilog sources and PDF documents, including in subdirectories.
+*
+!*/
+!*.sv
+!*.pdf
+!.gitignore
