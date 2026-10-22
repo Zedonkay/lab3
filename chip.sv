@@ -1,4 +1,6 @@
 `default_nettype none
+//AI (codex 4ish messages) used to clean up the code (style things) 
+//AI (codex 5ish messages) used to rsync to ece before starting git
 
 // Uncomment exactly one complete ChipInterface module, including its header.
 // Part 3 is selected.
