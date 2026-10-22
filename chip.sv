@@ -19,7 +19,8 @@
 //     assign reset = SW[17];
 //     assign hMove = SW[15:12];
 //
-//     myExplicitFSM fsm (.fMove, .win, .q0(), .q1(), .q2(), .hMove, .clock, .reset);
+//     myExplicitFSM fsm (.fMove, .win, .q0(), .q1(), .q2(), 
+//                        .hMove, .clock, .reset);
 //
 //     HextoSevenSegment fsm_move_display (.hex(fMove), .segment(DS2_SEG));
 //
