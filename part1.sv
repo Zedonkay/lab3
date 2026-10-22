@@ -1,3 +1,4 @@
+`default_nettype none
 module dFlipFlop (
     output logic q,
     input logic d, clock, reset
