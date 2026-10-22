@@ -1,5 +1,4 @@
 `default_nettype none
-
 module myExpandedFSM (
     output logic [3:0] fMove,
     output logic win,
@@ -10,7 +9,6 @@ module myExpandedFSM (
     input logic enter, new_game,
     input logic clock, reset
 );
-
     typedef enum logic [5:0] {
         START5, HOLD6, PLAY1, HOLD9, PLAY3,
         HOLD_H2_WIN9, HOLD_H3_WIN9, HOLD_H4_WIN9,
@@ -30,7 +28,6 @@ module myExpandedFSM (
         WIN2_H8_READY_NEW, WIN2_H8_WAIT_BOTH_RELEASE
     } state_t;
     state_t currState, nextState;
-
     always_comb begin
         nextState = currState;
         case (currState)
@@ -132,7 +129,6 @@ module myExpandedFSM (
             default: nextState = START5;
         endcase
     end
-
     always_comb begin
         fMove = 4'd5;
         win = 1'b0;
@@ -193,10 +189,14 @@ module myExpandedFSM (
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1590;
                 blank = 8'b0011_0001;
                 case (currState)
-                    WIN9_H2, WIN9_H2_READY_NEW, WIN9_H2_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
-                    WIN9_H3, WIN9_H3_READY_NEW, WIN9_H3_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
-                    WIN9_H4, WIN9_H4_READY_NEW, WIN9_H4_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
-                    WIN9_H7, WIN9_H7_READY_NEW, WIN9_H7_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
+                    WIN9_H2, WIN9_H2_READY_NEW, WIN9_H2_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h2600;
+                    WIN9_H3, WIN9_H3_READY_NEW, WIN9_H3_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h3600;
+                    WIN9_H4, WIN9_H4_READY_NEW, WIN9_H4_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h4600;
+                    WIN9_H7, WIN9_H7_READY_NEW, WIN9_H7_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h6700;
                     default: {HEX7, HEX6, HEX5, HEX4} = 16'h6800;
                 endcase
             end
@@ -207,22 +207,25 @@ module myExpandedFSM (
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1357;
                 blank = 8'b0001_0000;
             end
-            WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE, WIN2_H7, WIN2_H7_READY_NEW,
-            WIN2_H7_WAIT_BOTH_RELEASE, WIN2_H8, WIN2_H8_READY_NEW, WIN2_H8_WAIT_BOTH_RELEASE: begin
+            WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE, WIN2_H7,
+                WIN2_H7_READY_NEW,
+            WIN2_H7_WAIT_BOTH_RELEASE, WIN2_H8, WIN2_H8_READY_NEW,
+                WIN2_H8_WAIT_BOTH_RELEASE: begin
                 fMove = 4'd2;
                 win = 1'b1;
                 {HEX3, HEX2, HEX1, HEX0} = 16'h1235;
                 blank = 8'b0001_0000;
                 case (currState)
-                    WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
-                    WIN2_H7, WIN2_H7_READY_NEW, WIN2_H7_WAIT_BOTH_RELEASE: {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
+                    WIN2_H4, WIN2_H4_READY_NEW, WIN2_H4_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h4690;
+                    WIN2_H7, WIN2_H7_READY_NEW, WIN2_H7_WAIT_BOTH_RELEASE:
+                        {HEX7, HEX6, HEX5, HEX4} = 16'h6790;
                     default: {HEX7, HEX6, HEX5, HEX4} = 16'h6890;
                 endcase
             end
             default: begin end
         endcase
     end
-
     always_ff @(posedge clock)
         if (reset)
             currState <= START5;

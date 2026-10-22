@@ -1,6 +1,5 @@
 `timescale 1ns/1ps
 `default_nettype none
-
 module part3_tb;
     logic clock = 0;
     always #5 clock = ~clock;
@@ -10,7 +9,6 @@ module part3_tb;
     logic [3:0] HEX7, HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0;
     logic [7:0] blank;
     myExpandedFSM dut (.*);
-
     logic [17:0] SW;
     logic [3:0] BTN;
     wire [17:0] LD;
@@ -19,11 +17,9 @@ module part3_tb;
     wire [7:0] D1_SEG, D2_SEG;
     ChipInterface board (.CLOCK_100(clock), .*);
     integer checks = 0;
-
     task automatic tick;
         @(posedge clock); #1;
     endtask
-
     task automatic check_outputs(
         input logic [3:0] expected_move,
         input logic expected_win,
@@ -33,28 +29,27 @@ module part3_tb;
         checks = checks + 1;
         if ({fMove, win, HEX7, HEX6, HEX5, HEX4,
              HEX3, HEX2, HEX1, HEX0, blank} !==
-            {expected_move, expected_win, human_digits, fpga_digits, expected_blank})
-            $fatal(1, "state=%0d: got f=%h win=%b H=%h F=%h blank=%h; expected %h %b %h %h %h",
+            {expected_move, expected_win, human_digits, fpga_digits,
+                expected_blank})
+            $fatal(1, {"state=%0d: got f=%h win=%b H=%h F=%h blank=%h; ",
+                "expected %h %b %h %h %h"},
                 dut.currState, fMove, win, {HEX7, HEX6, HEX5, HEX4},
                 {HEX3, HEX2, HEX1, HEX0}, blank,
-                expected_move, expected_win, human_digits, fpga_digits, expected_blank);
+                expected_move, expected_win, human_digits, fpga_digits,
+                    expected_blank);
     endtask
-
     task automatic check_start;
         check_outputs(5, 0, 16'h0000, 16'h5000, 8'hf7);
     endtask
-
     task automatic check_win9;
         check_outputs(9, 1, 16'h2600, 16'h1590, 8'h31);
     endtask
-
     task automatic reset_game;
         reset = 1; enter = 0; new_game = 0; hMove = 0;
         tick(); check_start();
         reset = 0;
         tick(); check_start();
     endtask
-
     task automatic submit(
         input logic [3:0] move_value, old_fpga_move, next_fpga_move,
         input logic next_win,
@@ -63,50 +58,51 @@ module part3_tb;
     );
         hMove = move_value; enter = 1;
         tick();
-        check_outputs(old_fpga_move, 0, human_digits, old_fpga_digits, held_blank);
+        check_outputs(old_fpga_move, 0, human_digits, old_fpga_digits,
+            held_blank);
         for (int v = 0; v < 16; v++) begin
             hMove = v; tick();
-            check_outputs(old_fpga_move, 0, human_digits, old_fpga_digits, held_blank);
+            check_outputs(old_fpga_move, 0, human_digits, old_fpga_digits,
+                held_blank);
         end
         enter = 0; tick();
-        check_outputs(next_fpga_move, next_win, human_digits, next_fpga_digits, released_blank);
+        check_outputs(next_fpga_move, next_win, human_digits, next_fpga_digits,
+            released_blank);
     endtask
-
     task automatic first_move;
         submit(6, 5, 1, 0, 16'h6000, 16'h5000, 16'h1500, 8'h77, 8'h73);
     endtask
-
     task automatic second_nine;
         submit(9, 1, 3, 0, 16'h6900, 16'h1500, 16'h1350, 8'h33, 8'h31);
     endtask
-
     task automatic restart_terminal(
         input logic [3:0] expected_move,
         input logic [15:0] human_digits, fpga_digits,
         input logic [7:0] expected_blank
     );
         tick();
-        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        check_outputs(expected_move, 1, human_digits, fpga_digits,
+            expected_blank);
         enter = 1; tick();
-        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        check_outputs(expected_move, 1, human_digits, fpga_digits,
+            expected_blank);
         new_game = 1; tick();
-        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        check_outputs(expected_move, 1, human_digits, fpga_digits,
+            expected_blank);
         new_game = 0; tick();
-        check_outputs(expected_move, 1, human_digits, fpga_digits, expected_blank);
+        check_outputs(expected_move, 1, human_digits, fpga_digits,
+            expected_blank);
         enter = 0; tick(); check_start();
     endtask
-
     task automatic reach_win;
         reset_game(); first_move();
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
         tick(); check_win9();
     endtask
-
     initial begin
         logic [15:0] human_digits;
         SW = 0; SW[15] = 1; BTN = 0;
         reset_game();
-
         for (int v = 0; v < 16; v++) begin
             if (v != 6) begin
                 reset_game(); hMove = v; enter = 1; tick(); check_start();
@@ -124,7 +120,8 @@ module part3_tb;
                     7: human_digits = 16'h6700;
                     8: human_digits = 16'h6800;
                 endcase
-                submit(v, 1, 9, 1, human_digits, 16'h1500, 16'h1590, 8'h33, 8'h31);
+                submit(v, 1, 9, 1, human_digits, 16'h1500, 16'h1590, 8'h33,
+                    8'h31);
                 repeat (3) tick();
                 check_outputs(9, 1, human_digits, 16'h1590, 8'h31);
                 restart_terminal(9, human_digits, 16'h1590, 8'h31);
@@ -164,49 +161,39 @@ module part3_tb;
                 check_outputs(3, 0, 16'h6900, 16'h1350, 8'h31);
             end
         end
-
         reach_win(); repeat (5) tick(); check_win9();
         enter = 1; repeat (5) tick(); check_win9();
         enter = 0; tick(); check_win9();
-
         new_game = 1; repeat (5) tick(); check_win9();
         new_game = 0; tick(); check_start();
-
         reach_win(); new_game = 1; tick();
         enter = 1; tick(); check_win9();
         enter = 0; tick(); check_win9();
         new_game = 0; tick(); check_start();
-
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         enter = 0; tick(); check_win9();
         new_game = 0; tick(); check_start();
-
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         new_game = 0; repeat (4) tick(); check_win9();
         new_game = 1; tick(); new_game = 0; tick(); check_win9();
         enter = 0; tick(); check_start();
-
         reach_win(); new_game = 1; tick(); enter = 1; tick();
         new_game = 0; repeat (4) tick(); check_win9();
         enter = 0; tick(); check_start();
-
         reach_win(); enter = 1; tick(); new_game = 1; tick();
         enter = 0; tick(); check_win9();
         enter = 1; tick(); new_game = 0; tick(); check_win9();
         enter = 0; tick(); check_start();
-
         reset_game(); new_game = 1; tick(); new_game = 0; tick();
         check_start(); first_move();
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
         repeat (4) tick(); check_win9();
-
         reset_game(); first_move(); new_game = 1;
         submit(2, 1, 9, 1, 16'h2600, 16'h1500, 16'h1590, 8'h33, 8'h31);
         repeat (4) tick(); check_win9();
         new_game = 0; tick(); check_win9();
         new_game = 1; tick(); check_win9();
         new_game = 0; tick(); check_start();
-
         reset_game(); hMove = 6; enter = 1; tick();
         reset = 1; tick(); check_start();
         reset_game(); first_move(); hMove = 2; enter = 1; tick();
@@ -215,7 +202,6 @@ module part3_tb;
         reset = 1; tick(); check_start();
         reset_game(); hMove = 0; enter = 1; tick();
         reset = 1; tick(); check_start();
-
         repeat (5) tick();
         if (LD !== 18'd5 || RGB1 !== 0 || RGB0 !== 0)
             $fatal(1, "Board reset outputs incorrect");
@@ -237,7 +223,6 @@ module part3_tb;
         BTN[0] = 0; repeat (5) tick();
         if (LD !== 18'd5 || RGB1 !== 0 || board.blank !== 8'hf7)
             $fatal(1, "Board restart incorrect");
-
         SW[15] = 1; repeat (5) tick();
         SW[15] = 0; repeat (5) tick();
         if (D1_AN !== 4'b1110 || D2_AN !== 4'b1110 ||
@@ -253,10 +238,10 @@ module part3_tb;
         if (D1_AN !== 4'b0111 || D2_AN !== 4'b0111 ||
             D1_SEG !== 8'hff || D2_SEG !== 8'h92)
             $fatal(1, "Display index three must show FPGA's initial 5");
-        $display("PASS: %0d FSM output checks, board integration and display scan", checks);
+        $display({"PASS: %0d FSM output checks, board integration ",
+                "and display scan"}, checks);
         $finish;
     end
-
     initial begin
         #10000000;
         $fatal(1, "Testbench timed out");
